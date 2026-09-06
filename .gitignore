@@ -4,6 +4,8 @@
 # .NET
 backend/bin/
 backend/obj/
+backend/**/*.user
+backend/.vs/
 
 # Java
 chatbot/target/

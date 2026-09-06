@@ -46,6 +46,7 @@ services:
         condition: service_healthy
     environment:
       ASPNETCORE_ENVIRONMENT: ${ASPNETCORE_ENVIRONMENT}
+      ASPNETCORE_URLS: http://+:8080
       ConnectionStrings__Default: "Host=postgres;Database=${POSTGRES_DB};Username=${POSTGRES_USER};Password=${POSTGRES_PASSWORD}"
       RabbitMq__Host: rabbitmq
       RabbitMq__User: ${RABBITMQ_USER}
@@ -54,7 +55,7 @@ services:
     volumes:
       - storage_data:/storage
     ports:
-      - "8443:8443" # HTTPS
+      - "8080:8080"
 
   chatbot:
     build: ./chatbot
