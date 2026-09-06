@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
+using Backend.Data;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -9,7 +10,7 @@ var builder = WebApplication.CreateBuilder(args);
 var connectionString = builder.Configuration.GetConnectionString("Default");
 
 // 2. Configura o Banco de Dados PostgreSQL (Requisito Multi-tenant / Concorrência)
-// builder.Services.AddDbContext(options => options.UseNpgsql(connectionString));
+builder.Services.AddDbContext<AppDbContext>(options => options.UseNpgsql(connectionString));
 
 // 3. Configura a Base do Sistema de Autenticação JWT
 var jwtSecret = builder.Configuration["Jwt:Secret"]

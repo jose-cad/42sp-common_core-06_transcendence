@@ -9,7 +9,7 @@
       "applicationUrl": "http://localhost:5082",
       "environmentVariables": {
         "ASPNETCORE_ENVIRONMENT": "Development",
-        "ConnectionStrings__Default": "Host=localhost;Database=fleet_db;Username=postgres;Password=postgres",
+        "ConnectionStrings__Default": "Host=localhost;Database=transcendence;Username=transcendence_user;Password=change_me",
         "JWT_SECRET": "ChaveSuperSecretaDeDesenvolvimentoComMaisDe32Caracteres!"
       }
     },
@@ -21,7 +21,7 @@
       "applicationUrl": "https://localhost:8443",
       "environmentVariables": {
         "ASPNETCORE_ENVIRONMENT": "Development",
-        "ConnectionStrings__Default": "Host=localhost;Database=fleet_db;Username=postgres;Password=postgres",
+        "ConnectionStrings__Default": "Host=localhost;Database=transcendence;Username=transcendence_user;Password=change_me",
         "JWT_SECRET": "ChaveSuperSecretaDeDesenvolvimentoComMaisDe32Caracteres!"
       }
     }
