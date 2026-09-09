@@ -1,8 +1,9 @@
+using Backend.Data;
+using Backend.Services;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
-using Backend.Data;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -16,26 +17,57 @@ builder.Services.AddDbContext<AppDbContext>(options => options.UseNpgsql(connect
 var jwtSecret = builder.Configuration["Jwt:Secret"]
              ?? builder.Configuration["JWT_SECRET"]
              ?? throw new InvalidOperationException("JWT_SECRET não configurado.");
+
 builder.Services.AddAuthentication(options =>
 {
-options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
-options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+    options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+    options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
 })
 .AddJwtBearer(options =>
 {
-options.TokenValidationParameters = new TokenValidationParameters
-{
-ValidateIssuerSigningKey = true,
-IssuerSigningKey = new SymmetricSecurityKey(Encoding.ASCII.GetBytes(jwtSecret)),
-ValidateIssuer = false,
-ValidateAudience = false
-};
+    options.TokenValidationParameters = new TokenValidationParameters
+    {
+        ValidateIssuerSigningKey = true,
+        IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtSecret)),
+        ValidateIssuer = false,
+        ValidateAudience = false
+    };
 });
+
+builder.Services.AddAuthorization();
 
 // 4. Adiciona suporte a Controllers e Swagger
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen();
+builder.Services.AddSwaggerGen(options =>
+{
+    options.AddSecurityDefinition("Bearer", new Microsoft.OpenApi.Models.OpenApiSecurityScheme
+    {
+        Name = "Authorization",
+        Type = Microsoft.OpenApi.Models.SecuritySchemeType.ApiKey,
+        Scheme = "Bearer",
+        BearerFormat = "JWT",
+        In = Microsoft.OpenApi.Models.ParameterLocation.Header,
+        Description = "Digite: Bearer {seu token}"
+    });
+
+    options.AddSecurityRequirement(new Microsoft.OpenApi.Models.OpenApiSecurityRequirement
+    {
+        {
+            new Microsoft.OpenApi.Models.OpenApiSecurityScheme
+            {
+                Reference = new Microsoft.OpenApi.Models.OpenApiReference
+                {
+                    Type = Microsoft.OpenApi.Models.ReferenceType.SecurityScheme,
+                    Id = "Bearer"
+                }
+            },
+            new string[] {}
+        }
+    });
+});
+
+builder.Services.AddScoped<TokenService>();
 
 var app = builder.Build();
 
@@ -43,8 +75,8 @@ var app = builder.Build();
 app.UseSwagger();
 app.UseSwaggerUI(c =>
 {
-c.SwaggerEndpoint("/swagger/v1/swagger.json", "Fleet Management API v1");
-c.RoutePrefix = "swagger"; // Acessível em https://localhost:8443/swagger
+    c.SwaggerEndpoint("/swagger/v1/swagger.json", "Fleet Management API v1");
+    c.RoutePrefix = "swagger"; // Acessível em https://localhost:8443/swagger
 });
 
 app.UseHttpsRedirection();
